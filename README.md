@@ -10,10 +10,12 @@ Edit `TARGET_CUDA_ARCHS` in `cmake/SetCompilerFlags.cmake`
 # Python
 
 ## Build module
-    cd python
-    git clone https://github.com/pybind/pybind11.githttps://github.com/pybind/pybind11.git
-    cd ..
-    pip install .
+```shell
+cd python
+git clone --depth 1 https://github.com/pybind/pybind11.githttps://github.com/pybind/pybind11.git
+cd ..
+pip install .
+```
 
 ### Bulid in Windows + Anaconda
 - Open `x64 Native Tools Command Prompt for VS`
@@ -30,7 +32,7 @@ mode = 'mirror' # clamp, border, mirror, or wrap
 result = cuda_filters.medfilt3(arr3d, filter_size, mode)
 ```
 
-In test environment with Intel Core i7-4790K and NVIDIA TITAN X(Pascal), cuda_filters.medfilt3 took about 0.88 secs and scipy.ndimage.median_filter (code shown below) took about 154 secs.
+In a test environment with Intel Core i7-4790K and NVIDIA TITAN X(Pascal), `cuda_filters.medfilt3` (shown above) took about 0.88 secs and `scipy.ndimage.median_filter` (code shown below) took about 154 secs.
 
 ```python
 from scipy.ndimage import median_filter
