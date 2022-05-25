@@ -45,7 +45,7 @@ py::array_t<T, py::array::c_style> medianFilter3D(py::array_t<T, py::array::c_st
   medianFilter3D<T>(static_cast<const T*>(arr.data()), static_cast<T*>(result.mutable_data()), dims, filter_size, mode);
   return result;
 }
-void medianFilter3D(py::array arr)
+void medianFilter3D_error(py::array arr)
 {
   throw(std::invalid_argument("Invalid array type."));
 }
@@ -153,7 +153,7 @@ PYBIND11_MODULE(cuda_filters, m)
   m.def("medfilt3",&medianFilter3D<float, float>,"3D median filter.");
   m.def("medfilt3",&medianFilter3D<float, uint8_t>,"3D median filter.");
   m.def("medfilt3",&medianFilter3D<float, int16_t>,"3D median filter.");
-  m.def("medfilt3",&medianFilter3D,"3D median filter.");
+  m.def("medfilt3",&medianFilter3D_error,"3D median filter.");
   m.def("fillhole2",&fillhole2,"2D binary fill hole.");
   template_macro(m.def("dilate2",&pyoperate2D<PyMOP::Dilate,TT>,"2D dilate filter.",py::call_guard<py::scoped_ostream_redirect,py::scoped_estream_redirect>()))
   template_macro(m.def("erode2",&pyoperate2D<PyMOP::Erode,TT>,"2D erode filter.",py::call_guard<py::scoped_ostream_redirect,py::scoped_estream_redirect>()))

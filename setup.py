@@ -47,7 +47,7 @@ class CMakeBuild(build_ext):
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            build_args += ['--', '-j2']
+            build_args += ['--', '-j4']
 
         cmake_args += ['-DBUILD_PYTHON_BINDING=ON']
         env = os.environ.copy()
@@ -60,7 +60,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='cuda_filter',
-    version='0.0.1',
+    version='0.1.0',
     author='Yuki Suzuki',
     author_email='y-suzuki@radiol.med.osaka-u.ac.jp',
     description='Image filters boosted by CUDA',

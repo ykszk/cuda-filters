@@ -143,16 +143,6 @@ __global__ void median_filter_kernel_3_2pix(cudaTextureObject_t input, PixelType
   output[(z+1)*dims.x*dims.y + y*dims.x + x] = b[9];
 }
 
-namespace
-{
-  template <typename PixelType>
-  void call(cudaTextureObject_t tex, PixelType* d_output, const int3 &dims, int filter_size)
-  {
-    median_filter_kernel_3_2pix <PixelType> << <gridSize, blockSize >> > (tex, d_output, dims);
-    median_filter_kernel_3<PixelType> << <gridSize, blockSize >> > (tex, d_output, dims, offset);
-  }
-}
-
 #define instantiate(TYPE) \
 template __global__ void median_filter_kernel_3<TYPE>(cudaTextureObject_t, TYPE *, int3, int3); \
 template __global__ void median_filter_kernel_3_2pix<TYPE>(cudaTextureObject_t, TYPE *, int3);

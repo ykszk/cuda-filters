@@ -12,13 +12,14 @@ public:
   {
     cuArray = createCudaArray(dims, array_flags);
     updateArray(data, kind);
-    tex = create3DTexture(cuArray.get(), addressMode, filterMode);
+    tex = create3DTexture(cuArray, addressMode, filterMode);
   }
   ~scopedTextureObject()
   {
     cudaDestroyTextureObject(tex);
+    cudaFreeArray(cuArray);
   }
-  cudaTextureObject_t scopedTextureObject::get()
+  cudaTextureObject_t get()
   {
     return tex;
   }
@@ -27,23 +28,23 @@ public:
     cudaExtent extent = make_cudaExtent(dims_.x, dims_.y, dims_.z);
     cudaMemcpy3DParms parms = { 0 };
     parms.srcPtr = make_cudaPitchedPtr(const_cast<T*>(data), dims_.x * sizeof(T), dims_.x, dims_.y);
-    parms.dstArray = cuArray.get();
+    parms.dstArray = cuArray;
     parms.extent = extent;
     parms.kind = kind;
     CUDA_SAFE_CALL_NO_SYNC(cudaMemcpy3DAsync(&parms));
    }
-  static std::shared_ptr<cudaArray> createCudaArray(const int3 &dims, unsigned int flags)
+  static cudaArray* createCudaArray(const int3 &dims, unsigned int flags)
   {
     cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<T>();
     channelDesc.x = 8 * sizeof(T);
     channelDesc.y = channelDesc.z = channelDesc.w = 0;
     cudaExtent extent = make_cudaExtent(dims.x, dims.y, dims.z);
-    cudaArray *cuArray;
-    CUDA_SAFE_CALL_NO_SYNC(cudaMalloc3DArray(&cuArray, &channelDesc, extent, flags));
-    return std::shared_ptr<cudaArray>(cuArray);
+    cudaArray *tmp_ptr;
+    CUDA_SAFE_CALL_NO_SYNC(cudaMalloc3DArray(&tmp_ptr, &channelDesc, extent, flags));
+    return tmp_ptr;
   }
 private:
-  std::shared_ptr<cudaArray> cuArray;
+  cudaArray* cuArray;
   cudaTextureObject_t tex;
   int3 dims_;
 
@@ -73,33 +74,33 @@ public:
     : dims_(dims)
   {
     cuArray = createCudaArray(dims, array_flags);
-    CUDA_SAFE_CALL_NO_SYNC(cudaMemcpyToArray(cuArray.get(), 0, 0, data, sizeof(T)*dims.x*dims.y, kind));
-    tex = create2DTexture(cuArray.get(), addressMode, filterMode);
+    CUDA_SAFE_CALL_NO_SYNC(cudaMemcpyToArray(cuArray, 0, 0, data, sizeof(T)*dims.x*dims.y, kind));
+    tex = create2DTexture(cuArray, addressMode, filterMode);
   }
   ~scopedTextureObject2D()
   {
     cudaDestroyTextureObject(tex);
+    cudaFreeArray(cuArray);
   }
   void updateArray(const T *data, cudaMemcpyKind kind)
   {
-    CUDA_SAFE_CALL_NO_SYNC(cudaMemcpyToArray(cuArray.get(), 0, 0, data, sizeof(T)*dims_.x*dims_.y, kind));
+    CUDA_SAFE_CALL_NO_SYNC(cudaMemcpyToArray(cuArray, 0, 0, data, sizeof(T)*dims_.x*dims_.y, kind));
   }
-  cudaTextureObject_t scopedTextureObject2D::get()
+  cudaTextureObject_t get()
   {
     return tex;
   }
-  static std::shared_ptr<cudaArray> createCudaArray(const int2 &dims, unsigned int flags)
+  static cudaArray* createCudaArray(const int2 &dims, unsigned int flags)
   {
     cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<T>();
     channelDesc.x = 8 * sizeof(T);
     channelDesc.y = channelDesc.z = channelDesc.w = 0;
     cudaArray *tmp_ptr;
     CUDA_SAFE_CALL_NO_SYNC(cudaMallocArray(&tmp_ptr, &channelDesc, dims.x, dims.y));
-    std::shared_ptr<cudaArray> cuArray(tmp_ptr, [](cudaArray *ptr) {cudaFreeArray(ptr); });
-    return cuArray;
+    return tmp_ptr;
   }
 private:
-  std::shared_ptr<cudaArray> cuArray;
+  cudaArray* cuArray;
   cudaTextureObject_t tex;
   int2 dims_;
   scopedTextureObject2D(const scopedTextureObject2D&) = delete;

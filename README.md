@@ -12,7 +12,7 @@ Edit `TARGET_CUDA_ARCHS` in `cmake/SetCompilerFlags.cmake`
 ## Build module
 ```shell
 cd python
-git clone --depth 1 https://github.com/pybind/pybind11.githttps://github.com/pybind/pybind11.git
+git clone --depth 1 https://github.com/pybind/pybind11.git
 cd ..
 pip install .
 ```
