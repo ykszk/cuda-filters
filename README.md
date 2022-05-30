@@ -2,14 +2,25 @@
 * 3D median filter
   * Using forgetful selection.
   * Only filter size 3, 5, and 7 are available.
-* basic morphological filters
+
+# Setup
+
+## Requirements
+- CUDA
+- CMake
 
 ## Build
 Edit `TARGET_CUDA_ARCHS` in `cmake/SetCompilerFlags.cmake`
 
-# Python
+```sh
+mkdir build && cd build
+cmake ..
+make
+```
 
-## Build module
+## Python module
+
+### Build module
 ```shell
 cd python
 git clone --depth 1 https://github.com/pybind/pybind11.git
